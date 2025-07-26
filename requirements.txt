@@ -1,0 +1,21 @@
+ipykernel
+pandas
+numpy
+matplotlib
+plotly
+seaborn
+scikit-learn
+pymongo
+# from_root # Consider if this is needed or if it's an internal import
+dill
+certifi
+PyYAML
+boto3
+mypy-boto3-s3
+botocore
+fastapi
+python-multipart
+uvicorn  # Corrected from unicorn
+jinja2
+imbalanced-learn # Corrected from imblearn
+-e .

@@ -1,10 +1,15 @@
 1. Create project template by executing template.py file
 2. Write the code on setup.py and pyproject.toml file to import local packages
    >> Find more about "setup.py and pyproject.toml" at crashcourse.txt
-3. Create a virtual env, activate it and install the requirements from requirements.txt
+3. Create a vehicle_insurance env, activate it and install the requirements from requirements.txt
    conda create -n vehicle python=3.10 -y
+   python3.10 -m venv vehicle
+   .\vehicle\Scripts\Activate.ps1
+   Remove-Item -Path .\vehicle -Recurse -Force
+   conda init powershell
    conda activate vehicle
    add required modules to requirements.txt
+   conda env remove --name vehicle
    Do "pip install -r requirements.txt"
 4. Do a "pip list" on terminal to make sure you have local packages installed.
 
