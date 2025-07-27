@@ -211,7 +211,7 @@ __marimo__/
 # for safe my mongodb connection
 # .ipynb_checkpoints/
 # notebook/mongoDB_demo.ipynb
-notebook/
+testion_model/
 
 
 # not track artifact
