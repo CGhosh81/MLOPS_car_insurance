@@ -1,18 +1,20 @@
+# Use an official slim Python base image
 FROM python:3.10-slim
 
+# Set working directory inside the container
 WORKDIR /app
 
-# Copy app code
+# Copy all files from your local project directory to /app
 COPY . .
 
-# Install dependencies
-RUN pip install -r requirements.txt
+# Install Python dependencies
+RUN pip install --no-cache-dir -r requirements.txt
 
-# Set PYTHONPATH so internal imports work
+# Make sure Python can find all modules from /app
+ENV PYTHONPATH="${PYTHONPATH}:/app"
 
-
-# Expose port if needed
+# Expose the port your app runs on (change if different)
 EXPOSE 5000
 
-# Run the app
+# Run the main application
 CMD ["python", "app.py"]

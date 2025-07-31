@@ -42,3 +42,6 @@ def configure_logger():
 
 # Configure the logger
 configure_logger()
+from from_root import from_root
+
+print("Project Root:", from_root())
