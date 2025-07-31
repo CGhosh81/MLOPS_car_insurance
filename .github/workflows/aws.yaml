@@ -34,14 +34,15 @@ jobs:
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
           echo "::set-output name=image::$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
 
-Continuous-Deployment:
-    # This job runs after the build job is successful
+  Continuous-Deployment:
     needs: Continuous-Integration
     runs-on: self-hosted
-
     steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
       - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v4 # Updated action
+        uses: aws-actions/configure-aws-credentials@v1
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -49,50 +50,8 @@ Continuous-Deployment:
 
       - name: Login to Amazon ECR
         id: login-ecr
-        uses: aws-actions/amazon-ecr-login@v2 # Updated action
+        uses: aws-actions/amazon-ecr-login@v1
 
-      - name: Pull, Stop, and Run Docker Image
-        env:
-          # Use the image URI passed from the build job for reliability
-          IMAGE_URI: ${{ needs.Continuous-Integration.outputs.image_uri }}
-          CONTAINER_NAME: my-app-container # A consistent name for your container
+      - name: Run Docker Image to serve users
         run: |
-          # 1. Pull the new image from ECR to ensure we have the latest version.
-          # This is the essential step that was missing.
-          docker pull "$IMAGE_URI"
-          
-          # 2. Stop and remove the existing container if it's running.
-          # The '|| true' ensures the workflow doesn't fail if the container doesn't exist yet.
-          docker stop "$CONTAINER_NAME" || true
-          docker rm "$CONTAINER_NAME" || true
-          
-          # 3. Run the new container with a specific name and environment variables.
-          docker run -d --name "$CONTAINER_NAME" \
-            -e AWS_ACCESS_KEY_ID="${{ secrets.AWS_ACCESS_KEY_ID }}" \
-            -e AWS_SECRET_ACCESS_KEY="${{ secrets.AWS_SECRET_ACCESS_KEY }}" \
-            -e AWS_DEFAULT_REGION="${{ secrets.AWS_DEFAULT_REGION }}" \
-            -e MONGODB_URL="${{ secrets.MONGODB_URL }}" \
-            -p 5000:5000 \
-            "$IMAGE_URI"
-
-  # Continuous-Deployment:
-  #   needs: Continuous-Integration
-  #   runs-on: self-hosted
-  #   steps:
-  #     - name: Checkout
-  #       uses: actions/checkout@v3
-
-  #     - name: Configure AWS credentials
-  #       uses: aws-actions/configure-aws-credentials@v1
-  #       with:
-  #         aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-  #         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-  #         aws-region: ${{ secrets.AWS_DEFAULT_REGION }}
-
-  #     - name: Login to Amazon ECR
-  #       id: login-ecr
-  #       uses: aws-actions/amazon-ecr-login@v1
-
-  #     - name: Run Docker Image to serve users
-  #       run: |
-  #        docker run -d -e AWS_ACCESS_KEY_ID="${{ secrets.AWS_ACCESS_KEY_ID }}" -e AWS_SECRET_ACCESS_KEY="${{ secrets.AWS_SECRET_ACCESS_KEY }}" -e AWS_DEFAULT_REGION="${{ secrets.AWS_DEFAULT_REGION }}" -e MONGODB_URL="${{ secrets.MONGODB_URL }}" -p 5000:5000 "${{ steps.login-ecr.outputs.registry }}"/"${{ secrets.ECR_REPO }}":latest
+         docker run -d -e AWS_ACCESS_KEY_ID="${{ secrets.AWS_ACCESS_KEY_ID }}" -e AWS_SECRET_ACCESS_KEY="${{ secrets.AWS_SECRET_ACCESS_KEY }}" -e AWS_DEFAULT_REGION="${{ secrets.AWS_DEFAULT_REGION }}" -e MONGODB_URL="${{ secrets.MONGODB_URL }}" -p 5000:5000 "${{ steps.login-ecr.outputs.registry }}"/"${{ secrets.ECR_REPO }}":latest
