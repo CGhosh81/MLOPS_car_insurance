@@ -55,7 +55,6 @@
 #       - name: Run Docker Image to serve users
 #         run: |
 #          docker run -d -e AWS_ACCESS_KEY_ID="${{ secrets.AWS_ACCESS_KEY_ID }}" -e AWS_SECRET_ACCESS_KEY="${{ secrets.AWS_SECRET_ACCESS_KEY }}" -e AWS_DEFAULT_REGION="${{ secrets.AWS_DEFAULT_REGION }}" -e MONGODB_URL="${{ secrets.MONGODB_URL }}" -p 5000:5000 "${{ steps.login-ecr.outputs.registry }}"/"${{ secrets.ECR_REPO }}":latest
-
 name: Deploy Application Docker Image to EC2 instance
 
 on:
@@ -66,7 +65,7 @@ jobs:
   Continuous-Integration:
     runs-on: ubuntu-latest
     outputs:
-      image_uri: ${{ steps.build-image.outputs.image }}
+      image_uri: ${{ steps.set-image-uri.outputs.image }}
 
     steps:
       - name: Checkout code
@@ -83,17 +82,25 @@ jobs:
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v1
 
-      - name: Build, tag, and push image to Amazon ECR
-        id: build-image
+      - name: Build, tag, and push Docker image
+        id: build-and-push
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           ECR_REPOSITORY: ${{ secrets.ECR_REPO }}
           IMAGE_TAG: latest
         run: |
           IMAGE_URI="$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
+          echo "Building Docker image: $IMAGE_URI"
           docker build -t "$IMAGE_URI" .
           docker push "$IMAGE_URI"
-          echo "::set-output name=image::$IMAGE_URI"
+          echo "$IMAGE_URI" > image_uri.txt
+
+      - name: Set image URI output
+        id: set-image-uri
+        run: |
+          IMAGE_URI=$(cat image_uri.txt)
+          echo "Image URI to pass: $IMAGE_URI"
+          echo "image=$IMAGE_URI" >> $GITHUB_OUTPUT
 
   Continuous-Deployment:
     needs: Continuous-Integration
@@ -108,22 +115,24 @@ jobs:
           aws-region: ${{ secrets.AWS_DEFAULT_REGION }}
 
       - name: Login to Amazon ECR
-        id: login-ecr
         uses: aws-actions/amazon-ecr-login@v1
 
-      - name: Pull and Run Docker Image
+      - name: Pull, Stop, and Run Docker Container
         env:
           IMAGE_URI: ${{ needs.Continuous-Integration.outputs.image_uri }}
           CONTAINER_NAME: my-app-container
         run: |
           echo "Pulling image: $IMAGE_URI"
-          docker pull "$IMAGE_URI"
+          if [ -z "$IMAGE_URI" ]; then
+            echo "ERROR: IMAGE_URI is empty"
+            exit 1
+          fi
 
-          echo "Stopping old container..."
+          docker pull "$IMAGE_URI"
           docker stop "$CONTAINER_NAME" || true
           docker rm "$CONTAINER_NAME" || true
 
-          echo "Starting new container..."
+          echo "Running container..."
           docker run -d --name "$CONTAINER_NAME" \
             -e AWS_ACCESS_KEY_ID="${{ secrets.AWS_ACCESS_KEY_ID }}" \
             -e AWS_SECRET_ACCESS_KEY="${{ secrets.AWS_SECRET_ACCESS_KEY }}" \
