@@ -18,5 +18,5 @@ python-multipart
 uvicorn  # Corrected from unicorn
 jinja2
 imbalanced-learn # Corrected from imblearn
-from-root
+from-root==0.0.4
 -e .   # correction
