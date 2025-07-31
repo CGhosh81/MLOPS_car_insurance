@@ -10,7 +10,7 @@ COPY . .
 # Install Python dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Make sure Python can find all modules from /app
+# Make sure Python can find all modules from /app askjfjewn
 ENV PYTHONPATH="${PYTHONPATH}:/app"
 
 # Expose the port your app runs on (change if different)
