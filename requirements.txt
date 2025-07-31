@@ -19,4 +19,4 @@ uvicorn  # Corrected from unicorn
 jinja2
 imbalanced-learn # Corrected from imblearn
 from-root # add from_root file
--e .   # correction ksfckjds
+-e .   # correction
