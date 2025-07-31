@@ -6,10 +6,10 @@ WORKDIR /app
 COPY . .
 
 # Install dependencies
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install -r requirements.txt
 
 # Set PYTHONPATH so internal imports work
-ENV PYTHONPATH="${PYTHONPATH}:/app"
+
 
 # Expose port if needed
 EXPOSE 5000
