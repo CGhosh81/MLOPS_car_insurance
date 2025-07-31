@@ -19,4 +19,4 @@ uvicorn  # Corrected from unicorn
 jinja2
 imbalanced-learn # Corrected from imblearn
 from-root
--e .
+-e .   # correction
