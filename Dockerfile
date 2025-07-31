@@ -1,15 +1,17 @@
 FROM python:3.10-slim
 
-# Set working directory
 WORKDIR /app
 
 # Copy app code
-COPY . /app
+COPY . .
 
 # Install dependencies
-RUN pip install -r requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
 
-# Expose port
+# Set PYTHONPATH so internal imports work
+ENV PYTHONPATH="${PYTHONPATH}:/app"
+
+# Expose port if needed
 EXPOSE 5000
 
 # Run the app
