@@ -102,7 +102,7 @@ docker run -p 8000:8000 car-insurance-mlops
 
 ## 👨‍💻 Author
 
-- **Your Name** — [GitHub](https://github.com/yourusername)
+- Chayan Ghosh
 
 ## 📄 License
 
