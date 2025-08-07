@@ -96,7 +96,7 @@ docker run -p 8000:8000 car-insurance-mlops
 
 ## ✅ To-Do
 
-- [ ] Add FastAPI/Streamlit frontend
+- [ ] Add FastAPI
 - [ ] Complete AWS EC2 deployment
 - [ ] Add model monitoring (e.g., Prometheus/Grafana)
 
