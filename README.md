@@ -98,7 +98,6 @@ docker run -p 8000:8000 car-insurance-mlops
 
 - [ ] Add FastAPI
 - [ ] Complete AWS EC2 deployment
-- [ ] Add model monitoring (e.g., Prometheus/Grafana)
 
 ## 👨‍💻 Author
 
