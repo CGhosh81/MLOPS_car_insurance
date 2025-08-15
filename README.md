@@ -38,7 +38,6 @@ mlops_car_insurance/
 - Docker
 - GitHub Actions (CI/CD)
 - AWS EC2 (deployment-ready)
-- Logging module
 
 ## 🚀 Getting Started
 
